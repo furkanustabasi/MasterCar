@@ -1,0 +1,12 @@
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\obj\Debug\net5.0\Core.csproj.AssemblyReference.cache
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\obj\Debug\net5.0\Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\obj\Debug\net5.0\Core.AssemblyInfoInputs.cache
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\obj\Debug\net5.0\Core.AssemblyInfo.cs
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\obj\Debug\net5.0\Core.csproj.CoreCompileInputs.cache
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\bin\Debug\net5.0\Core.deps.json
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\bin\Debug\net5.0\Core.dll
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\bin\Debug\net5.0\ref\Core.dll
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\bin\Debug\net5.0\Core.pdb
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\obj\Debug\net5.0\Core.dll
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\obj\Debug\net5.0\ref\Core.dll
+C:\Users\Technix\Desktop\ULU\MasterCar\Core\obj\Debug\net5.0\Core.pdb
