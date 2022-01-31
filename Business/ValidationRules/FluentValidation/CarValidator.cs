@@ -12,8 +12,26 @@ namespace Business.ValidationRules.FluentValidation
     {
         public CarValidator()
         {
-            RuleFor(x => x.ModelName).MinimumLength(2);
-            RuleFor(x => x.DailyPrice).GreaterThan(0);
+            RuleFor(c => c.BrandId).NotEmpty();
+            RuleFor(c => c.BrandId).NotNull();
+            RuleFor(c => c.BrandId).GreaterThan(0);
+
+            RuleFor(c => c.ColorId).NotEmpty();
+            RuleFor(c => c.ColorId).NotNull();
+            RuleFor(c => c.ColorId).GreaterThan(0);
+
+            RuleFor(c => c.DailyPrice).NotEmpty();
+            RuleFor(c => c.DailyPrice).NotNull();
+            RuleFor(c => c.DailyPrice).GreaterThan(0);
+
+            RuleFor(c => c.ModelYear).NotEmpty();
+            RuleFor(c => c.ModelYear).NotNull();
+
+            RuleFor(c => c.ModelName).NotEmpty();
+            RuleFor(c => c.ModelName).NotNull();
+
+            RuleFor(c => c.Description).MinimumLength(2);
+
         }
     }
 }

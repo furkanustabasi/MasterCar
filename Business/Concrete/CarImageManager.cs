@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 using Core.Utilities.Business;
 using Core.Utilities.Helpers.FileHelper;
 using Core.Utilities.Results;
@@ -54,6 +56,7 @@ namespace Business.Concrete
             return ReturnDefaultImage(carId);
         }
 
+        [ValidationAspect(typeof(CarImageValidator))]
         public IResult Add(IFormFile file, CarImage carImage)
         {
             BusinessRules.Run(CheckIfCarExist(carImage.CarId), CarImageOutOfLimit(carImage.CarId));
@@ -97,6 +100,7 @@ namespace Business.Concrete
 
         }
 
+        [ValidationAspect(typeof(CarImageValidator))]
         public IResult Update(IFormFile file, CarImage carImage)
         {
             var isDeleted = Delete(carImage);
@@ -117,6 +121,7 @@ namespace Business.Concrete
             throw new NotImplementedException();
         }
 
+        [ValidationAspect(typeof(CarImageValidator))]
         public IResult Delete(CarImage carImage)
         {
             var source = CheckIfCarImageExist(carImage.Id);

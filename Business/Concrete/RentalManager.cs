@@ -1,5 +1,7 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -23,6 +25,7 @@ namespace Business.Concrete
             _carService = carService;
         }
 
+        [ValidationAspect(typeof(RentalValidator))]
         public IResult Add(Rental rental)
         {
             if (!CheckIfRentalIsAvaible(rental))
@@ -31,49 +34,51 @@ namespace Business.Concrete
             }
 
             _rentalDal.Add(rental);
-            return new SuccessResult(Messages.RentalAdded);
+            return new SuccessResult(Messages.AddedSuccess);
         }
 
+        [ValidationAspect(typeof(RentalValidator))]
         public IResult Delete(Rental rental)
         {
             _rentalDal.Delete(rental);
-            return new SuccessResult(Messages.RentalDeleted);
+            return new SuccessResult(Messages.DeleteSuccess);
         }
 
         public IDataResult<List<Rental>> GetAll()
         {
-            return new SuccessDataResult<List<Rental>>(_rentalDal.GetAll(), Messages.RentalsListed);
+            return new SuccessDataResult<List<Rental>>(_rentalDal.GetAll(), Messages.ListedSuccess);
         }
 
         public IDataResult<Rental> GetById(int id)
         {
-            return new SuccessDataResult<Rental>(_rentalDal.Get(x => x.Id == id), Messages.RentalsListed);
+            return new SuccessDataResult<Rental>(_rentalDal.Get(x => x.Id == id), Messages.ListedSuccess);
         }
 
         public IDataResult<RentalDetailDto> GetRentalDetailById(int id)
         {
-            return new SuccessDataResult<RentalDetailDto>(_rentalDal.GetRentalsDetail(x => x.Id == id).FirstOrDefault(), Messages.RentalListed);
+            return new SuccessDataResult<RentalDetailDto>(_rentalDal.GetRentalsDetail(x => x.Id == id).FirstOrDefault(), Messages.ListedSuccess);
         }
 
         public IDataResult<List<RentalDetailDto>> GetRentalsDetail()
         {
-            return new SuccessDataResult<List<RentalDetailDto>>(_rentalDal.GetRentalsDetail(), Messages.RentalsListed);
+            return new SuccessDataResult<List<RentalDetailDto>>(_rentalDal.GetRentalsDetail(), Messages.ListedSuccess);
         }
 
         public IDataResult<List<RentalDetailDto>> GetRentalsDetailByCarId(int id)
         {
-            return new SuccessDataResult<List<RentalDetailDto>>(_rentalDal.GetRentalsDetail(x=>x.CarId == id), Messages.RentalsListed);
+            return new SuccessDataResult<List<RentalDetailDto>>(_rentalDal.GetRentalsDetail(x=>x.CarId == id), Messages.ListedSuccess);
         }
 
         public IDataResult<List<RentalDetailDto>> GetRentalsDetailByCustomerId(int id)
         {
-            return new SuccessDataResult<List<RentalDetailDto>>(_rentalDal.GetRentalsDetail(x => x.CustomerId == id), Messages.RentalsListed);
+            return new SuccessDataResult<List<RentalDetailDto>>(_rentalDal.GetRentalsDetail(x => x.CustomerId == id), Messages.ListedSuccess);
         }
 
+        [ValidationAspect(typeof(RentalValidator))]
         public IResult Update(Rental rental)
         {
             _rentalDal.Update(rental);
-            return new SuccessResult(Messages.RentalUpdated);
+            return new SuccessResult(Messages.UpdateSuccess);
         }
 
 
