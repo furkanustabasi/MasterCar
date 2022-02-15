@@ -20,9 +20,10 @@ namespace Business.ValidationRules.FluentValidation
             RuleFor(r => r.CustomerId).GreaterThan(0);
             RuleFor(r => r.RentDate).NotEmpty();
             RuleFor(r => r.RentDate).NotNull();
+            RuleFor(r => r.RentDate).LessThan(r => r.ReturnDate);
             RuleFor(r => r.ReturnDate).NotEmpty();
             RuleFor(r => r.ReturnDate).NotNull();
-            RuleFor(r => r.RentDate).LessThan(r => r.ReturnDate);
+            
         }
     }
 }

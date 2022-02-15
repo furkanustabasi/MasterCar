@@ -1,6 +1,8 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
 using Core.Aspects.Autofac.Validation;
 using Core.Utilities.Business;
 using Core.Utilities.Helpers.FileHelper;
@@ -40,6 +42,9 @@ namespace Business.Concrete
             return new SuccessDataResult<List<CarImage>>(_carImageDal.GetAll(), Messages.ListedSuccess);
         }
 
+
+        [SecuredOperation("admin, carimage.ops, carimage.get")]
+        [CacheAspect(20)]
         public IDataResult<List<CarImage>> GetCarImages(int carId)
         {
 
@@ -56,7 +61,10 @@ namespace Business.Concrete
             return ReturnDefaultImage(carId);
         }
 
+        [SecuredOperation("admin, carimage.ops, carimage.add")]
         [ValidationAspect(typeof(CarImageValidator))]
+        [CacheRemoveAspect("ICarImageService.Get")]
+        [CacheRemoveAspect("ICarService.Get")]
         public IResult Add(IFormFile file, CarImage carImage)
         {
             BusinessRules.Run(CheckIfCarExist(carImage.CarId), CarImageOutOfLimit(carImage.CarId));
@@ -100,7 +108,10 @@ namespace Business.Concrete
 
         }
 
+        [SecuredOperation("admin, carimage.ops, carimage.update")]
         [ValidationAspect(typeof(CarImageValidator))]
+        [CacheRemoveAspect("ICarImageService.Get")]
+        [CacheRemoveAspect("ICarService.Get")]
         public IResult Update(IFormFile file, CarImage carImage)
         {
             var isDeleted = Delete(carImage);
@@ -121,7 +132,10 @@ namespace Business.Concrete
             throw new NotImplementedException();
         }
 
+        [SecuredOperation("admin, carimage.ops, carimage.delete")]
         [ValidationAspect(typeof(CarImageValidator))]
+        [CacheRemoveAspect("ICarImageService.Get")]
+        [CacheRemoveAspect("ICarService.Get")]
         public IResult Delete(CarImage carImage)
         {
             var source = CheckIfCarImageExist(carImage.Id);

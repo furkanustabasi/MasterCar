@@ -3,6 +3,7 @@ using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -36,6 +37,12 @@ namespace Business.Concrete
         [ValidationAspect(typeof(CarValidator))]
         public IResult Delete(Car car)
         {
+            var rulesResult = BusinessRules.Run(CheckIfCarIdExist(car.Id));
+            if (rulesResult != null)
+            {
+                return rulesResult;
+            }
+
             _carDal.Delete(car);
             return new SuccessResult(Messages.DeleteSuccess);
         }
@@ -119,6 +126,12 @@ namespace Business.Concrete
         [ValidationAspect(typeof(CarValidator))]
         public IResult Update(Car car)
         {
+            var rulesResult = BusinessRules.Run(CheckIfCarIdExist(car.Id));
+            if (rulesResult != null)
+            {
+                return rulesResult;
+            }
+
             _carDal.Update(car);
             return new SuccessResult(Messages.UpdateSuccess);
         }
@@ -126,6 +139,16 @@ namespace Business.Concrete
         public IDataResult<List<CarDetailDto>> GetCarsDetail()
         {
             return new SuccessDataResult<List<CarDetailDto>>(_carDal.GetCarsDetails(), Messages.ListedSuccess);
+        }
+
+        private IResult CheckIfCarIdExist(int carId)
+        {
+            var result = _carDal.GetAll(c => c.Id == carId).Any();
+            if (!result)
+            {
+                return new ErrorResult(Messages.NotFound);
+            }
+            return new SuccessResult();
         }
     }
 }

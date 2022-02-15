@@ -1,4 +1,5 @@
 ﻿using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Core.Entities.Concrete;
 using Core.Utilities.Business;
@@ -24,12 +25,24 @@ namespace Business.Concrete
 
         public IResult Add(User user)
         {
+            var rulesResult = BusinessRules.Run(CheckIfEmailExist(user.Email));
+            if (!rulesResult.Success)
+            {
+                return rulesResult;
+            }
+
             _userDal.Add(user);
             return new SuccessResult(Messages.AddedSuccess);
         }
 
+        [SecuredOperation("admin,user.ops,user.delete")]
         public IResult Delete(User user)
         {
+            if (!GetById(user.Id).Success)
+            {
+                return new ErrorResult(Messages.NotFound);
+            }
+
             _userDal.Delete(user);
             return new SuccessResult(Messages.DeleteSuccess);
         }
@@ -37,23 +50,41 @@ namespace Business.Concrete
         public IDataResult<List<User>> GetAll()
         {
             return new SuccessDataResult<List<User>>(_userDal.GetAll(), Messages.ListedSuccess);
-
         }
 
         public IDataResult<User> GetById(int id)
         {
-            return new SuccessDataResult<User>(_userDal.Get(x => x.Id == id), Messages.ListedSuccess);
+            var result = _userDal.Get(x => x.Id == id);
+            if (result != null)
+            {
+                return new SuccessDataResult<User>(result, Messages.ListedSuccess);
+            }
+
+            return new ErrorDataResult<User>(Messages.NotFound);
         }
 
+        [SecuredOperation("admin,user.ops,user.update")]
         public IResult Update(User user)
         {
+            var rulesResult = BusinessRules.Run(UpdateMailIfIsAvaible(user), CheckIfUserIdExist(user.Id));
+            if (!rulesResult.Success)
+            {
+                return rulesResult;
+            }
+
             _userDal.Update(user);
             return new SuccessResult(Messages.UpdateSuccess);
         }
 
         public IDataResult<User> GetUserByMail(string email)
         {
-            return new SuccessDataResult<User>(_userDal.Get(u => u.Email == email));
+            var result = _userDal.Get(u => u.Email == email);
+            if (result != null)
+            {
+                return new SuccessDataResult<User>(result);
+            }
+
+            return new ErrorDataResult<User>(Messages.NotFound);
         }
 
 
@@ -70,37 +101,39 @@ namespace Business.Concrete
 
         private IResult CheckIfUserIdExist(int userId)
         {
-            var result = _userDal.GetAll(u => u.Id == userId).Any();
-            if (!result)
+            if (!_userDal.GetAll(u => u.Id == userId).Any())
             {
                 return new ErrorResult(Messages.UserNotExist);
             }
+
             return new SuccessResult();
         }
 
         private IResult CheckIfEmailExist(string userEmail)
         {
-            var result = BaseCheckIfEmailExist(userEmail);
-            if (result)
+            if (_userDal.GetAll(u => u.Email == userEmail).Any())
             {
-                return new ErrorResult(Messages.UserEmailExist);
+                return new SuccessResult();
             }
-            return new SuccessResult();
+
+            return new ErrorResult();
         }
 
-        private IResult CheckIfEmailAvailable(string userEmail)
+        private IResult UpdateMailIfIsAvaible(User user)
         {
-            var result = BaseCheckIfEmailExist(userEmail);
-            if (!result)
+            if (!CheckIfEmailExist(user.Email).Success)
             {
-                return new ErrorResult(Messages.UserEmailNotAvailable);
+                return new SuccessResult();
             }
-            return new SuccessResult();
-        }
 
-        private bool BaseCheckIfEmailExist(string userEmail)
-        {
-            return _userDal.GetAll(u => u.Email == userEmail).Any();
+            var result = _userDal.Get(u => u.Id == user.Id);
+
+            if (result.Email == user.Email)
+            {
+                return new SuccessResult();
+            }
+
+            return new ErrorResult();
         }
     }
 }

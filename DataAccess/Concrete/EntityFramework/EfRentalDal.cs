@@ -38,7 +38,8 @@ namespace DataAccess.Concrete.EntityFramework
                              ModelName = car.ModelName,
                              ModelYear = car.ModelYear,
                              RentDate = rental.RentDate,
-                             ReturnDate = rental.ReturnDate
+                             ReturnDate = rental.ReturnDate,
+                             CertainReturnDate = rental.ReturnDate
 
                          };
             return filter == null

@@ -22,8 +22,14 @@ namespace Business.Concrete
         }
 
         [ValidationAspect(typeof(UserForRegisterDtoValidator))]
-        public IDataResult<User> Register(UserForRegisterDto userForRegisterDto, string password)
+        public IDataResult<AccessToken> Register(UserForRegisterDto userForRegisterDto, string password)
         {
+            var userExists = UserExists(userForRegisterDto.Email);
+            if (userExists.Success)
+            {
+                return new ErrorDataResult<AccessToken>(Messages.UserEmailExist);
+            }
+
             byte[] passwordHash, passwordSalt;
             HashingHelper.CreatePasswordHash(password, out passwordHash, out passwordSalt);
             var user = new User
@@ -35,40 +41,39 @@ namespace Business.Concrete
                 PasswordSalt = passwordSalt,
                 Status = true
             };
+
             _userService.Add(user);
-            return new SuccessDataResult<User>(user, Messages.UserRegistered);
+
+            return CreateAccessToken(user);
         }
 
         [ValidationAspect(typeof(UserForLoginDtoValidator))]
-        public IDataResult<User> Login(UserForLoginDto userForLoginDto)
+        public IDataResult<AccessToken> Login(UserForLoginDto userForLoginDto)
         {
-            var userToCheck = _userService.GetUserByMail(userForLoginDto.Email);
-            if (userToCheck.Data == null)
+            var isExists = UserExists(userForLoginDto.Email);
+            if (!isExists.Success)
             {
-                return new ErrorDataResult<User>(Messages.UserNotFound);
+                return new ErrorDataResult<AccessToken>(Messages.UserNotFound);
             }
 
-            if (!HashingHelper.VerifyPasswordHash(userForLoginDto.Password, userToCheck.Data.PasswordHash, userToCheck.Data.PasswordSalt))
+            if (!HashingHelper.VerifyPasswordHash(userForLoginDto.Password, isExists.Data.PasswordHash, isExists.Data.PasswordSalt))
             {
-                return new ErrorDataResult<User>(Messages.PasswordError);
+                return new ErrorDataResult<AccessToken>(Messages.PasswordError);
             }
 
-            return new SuccessDataResult<User>(userToCheck.Data, Messages.SuccessfulLogin);
+            return CreateAccessToken(isExists.Data);
         }
 
-        public IResult UserExists(string email)
+        public IDataResult<User> UserExists(string email)
         {
-            if (_userService.GetUserByMail(email).Data != null)
-            {
-                return new ErrorResult(Messages.UserAlreadyExists);
-            }
-            return new SuccessResult();
+            return _userService.GetUserByMail(email);
         }
 
         public IDataResult<AccessToken> CreateAccessToken(User user)
         {
             var claims = _userService.GetClaims(user);
             var accessToken = _tokenHelper.CreateToken(user, claims.Data);
+
             return new SuccessDataResult<AccessToken>(accessToken, Messages.AccessTokenCreated);
         }
 
